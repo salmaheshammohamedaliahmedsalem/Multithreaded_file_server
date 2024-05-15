@@ -2,11 +2,13 @@ import java.io.*;
 import java.net.*;
 
 public class FileServer {
+    private static final String BASE_DIRECTORY = "/path/to/your/files";
+
     public static void main(String[] args) {
         ServerSocket server = null;
 
         try {
-            server = new ServerSocket(1234);
+            server = new ServerSocket(1234, 50, InetAddress.getByName("0.0.0.0"));
             server.setReuseAddress(true);
 
             while (true) {
@@ -41,8 +43,9 @@ public class FileServer {
                 
                 String fileName;
                 while ((fileName = in.readLine()) != null) {
-                    File file = new File(fileName);
-                    if (file.exists()) {
+                    // Security check to ensure file path is within the allowed directory
+                    File file = new File(BASE_DIRECTORY, fileName);
+                    if (file.exists() && file.isFile() && file.getCanonicalPath().startsWith(new File(BASE_DIRECTORY).getCanonicalPath())) {
                         FileInputStream fileIn = new FileInputStream(file);
                         byte[] buffer = new byte[4096];
                         int count;
@@ -65,4 +68,3 @@ public class FileServer {
         }
     }
 }
-
