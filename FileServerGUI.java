@@ -162,9 +162,6 @@ public class FileServerGUI extends JFrame {
         private void handleWriteRequest(String fileName, BufferedReader in, DataOutputStream out) throws IOException {
             rwLock.writeLock().lock();
             try {
-                out.writeUTF("Please start entering lines to be added to the file. Send 'END' on a new line to finish.");
-                out.flush();
-
                 File file = new File(BASE_DIRECTORY, fileName);
                 try (FileWriter writer = new FileWriter(file, true);
                      BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
