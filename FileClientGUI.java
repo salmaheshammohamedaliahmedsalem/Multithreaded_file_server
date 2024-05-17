@@ -7,6 +7,7 @@ public class FileClientGUI extends JFrame {
     private JTextField ipField, portField, fileField;
     private JTextArea statusArea;
     private JComboBox<String> actionBox;
+    private JTextArea writeArea;
 
     public FileClientGUI() {
         super("File Client");
@@ -14,11 +15,12 @@ public class FileClientGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2));
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2));
         ipField = new JTextField("localhost");
         portField = new JTextField("1234");
         fileField = new JTextField();
         actionBox = new JComboBox<>(new String[]{"READ", "WRITE"});
+        writeArea = new JTextArea();
 
         inputPanel.add(new JLabel("Server IP:"));
         inputPanel.add(ipField);
@@ -28,6 +30,8 @@ public class FileClientGUI extends JFrame {
         inputPanel.add(fileField);
         inputPanel.add(new JLabel("Action:"));
         inputPanel.add(actionBox);
+        inputPanel.add(new JLabel("Write Content:"));
+        inputPanel.add(new JScrollPane(writeArea));
 
         add(inputPanel, BorderLayout.NORTH);
 
@@ -93,20 +97,18 @@ public class FileClientGUI extends JFrame {
     }
 
     private void handleWriteRequest(String fileName, PrintWriter out, DataInputStream in) throws IOException {
-        statusArea.append("Please enter the content to write to the file. Type 'END' on a new line to finish.\n");
+        String content = writeArea.getText();
+        String[] lines = content.split("\n");
 
-        try (BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in))) {
-            String line;
-            while (!(line = userIn.readLine()).equals("END")) {
-                out.println(line);
-                out.flush();
-            }
-            out.println("END");
+        for (String line : lines) {
+            out.println(line);
             out.flush();
-
-            String response = in.readUTF();
-            statusArea.append(response + "\n");
         }
+        out.println("END");
+        out.flush();
+
+        String response = in.readUTF();
+        statusArea.append(response + "\n");
     }
 
     public static void main(String[] args) {
